@@ -1,105 +1,68 @@
-import os
-
-from dotenv import load_dotenv
-from google import genai
-
-from tools import calculate
+from core.gemini import client
+from core.registry import GEMINI_TOOLS
+from core.executor import execute_tool
 
 
 # ============================================================
-# 1. GEMINI SETUP
+# 1. HUMAN MESSAGE
 # ============================================================
 
-load_dotenv()
+user_message = "What is 25 multiplied by 20?"
 
-client = genai.Client(
-    api_key=os.getenv("GEMINI_API_KEY")
-)
-
-
-# ============================================================
-# 2. TOOL REGISTRY
-# ============================================================
-
-tools = {
-    "calculate": calculate
-}
+print("\n👤 HUMAN")
+print(user_message)
 
 
 # ============================================================
-# 3. HUMAN MESSAGE
-# ============================================================
-
-human_message = "What is 25 + 35?"
-
-
-# ============================================================
-# 4. SEND MESSAGE + TOOLS TO GEMINI
+# 2. SEND MESSAGE TO GEMINI
 # ============================================================
 
 response = client.models.generate_content(
     model="gemini-3.5-flash",
-
-    contents=human_message,
-
+    contents=user_message,
     config={
-        "tools": [calculate]
+        "tools": GEMINI_TOOLS
     }
 )
 
 
 # ============================================================
-# 5. CHECK AI TOOL CALL
+# 3. READ AI TOOL CALL
 # ============================================================
 
 if response.function_calls:
 
     for call in response.function_calls:
 
-        tool_name = call.name
+        print("\n🤖 AI TOOL CALL")
 
-        tool_args = call.args
+        print("Tool name:")
+        print(call.name)
 
-        print("\n==============================")
-        print("AI TOOL CALL")
-        print("==============================")
-
-        print("Tool:", tool_name)
-
-        print("Arguments:", tool_args)
+        print("\nArguments:")
+        print(call.args)
 
 
         # ====================================================
-        # 6. FIND TOOL
+        # 4. EXECUTE TOOL
         # ====================================================
 
-        tool_function = tools.get(tool_name)
+        result = execute_tool(
+            call.name,
+            call.args
+        )
 
 
-        if tool_function is None:
+        print("\n🔧 TOOL EXECUTION")
 
-            print("Tool not found!")
+        print("Tool:")
+        print(call.name)
 
-            continue
-
-
-        # ====================================================
-        # 7. EXECUTE TOOL
-        # ====================================================
-
-        result = tool_function(**tool_args)
-
-
-        # ====================================================
-        # 8. TOOL RESULT
-        # ====================================================
-
-        print("\n==============================")
-        print("TOOL RESULT")
-        print("==============================")
-
+        print("Result:")
         print(result)
+
 
 else:
 
-    print("\nAI:", response.text)
+    print("\n🤖 AI")
+    print(response.text)
