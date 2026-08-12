@@ -4,22 +4,22 @@ from core.executor import execute_tool
 
 
 # ============================================================
-# 1. HUMAN MESSAGE
+# USER MESSAGE
 # ============================================================
 
-user_message = "What is 25 multiplied by 20?"
-
-print("\n👤 HUMAN")
-print(user_message)
+user_message = input("\n👤 You: ")
 
 
 # ============================================================
-# 2. SEND MESSAGE TO GEMINI
+# SEND TO GEMINI
 # ============================================================
 
 response = client.models.generate_content(
+
     model="gemini-3.5-flash",
+
     contents=user_message,
+
     config={
         "tools": GEMINI_TOOLS
     }
@@ -27,7 +27,7 @@ response = client.models.generate_content(
 
 
 # ============================================================
-# 3. READ AI TOOL CALL
+# CHECK TOOL CALL
 # ============================================================
 
 if response.function_calls:
@@ -36,15 +36,15 @@ if response.function_calls:
 
         print("\n🤖 AI TOOL CALL")
 
-        print("Tool name:")
+        print("Tool:")
         print(call.name)
 
-        print("\nArguments:")
+        print("Arguments:")
         print(call.args)
 
 
         # ====================================================
-        # 4. EXECUTE TOOL
+        # EXECUTE TOOL
         # ====================================================
 
         result = execute_tool(
@@ -53,16 +53,13 @@ if response.function_calls:
         )
 
 
-        print("\n🔧 TOOL EXECUTION")
+        print("\n🔧 TOOL RESULT")
 
-        print("Tool:")
-        print(call.name)
-
-        print("Result:")
         print(result)
 
 
 else:
 
     print("\n🤖 AI")
+
     print(response.text)
