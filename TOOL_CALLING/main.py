@@ -42,11 +42,6 @@ if response.function_calls:
         print("Arguments:")
         print(call.args)
 
-
-        # ====================================================
-        # EXECUTE TOOL
-        # ====================================================
-
         result = execute_tool(
             call.name,
             call.args
