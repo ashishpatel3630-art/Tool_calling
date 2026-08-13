@@ -3,16 +3,9 @@ from core.registry import GEMINI_TOOLS
 from core.executor import execute_tool
 
 
-# ============================================================
-# USER MESSAGE
-# ============================================================
 
 user_message = input("\n👤 You: ")
 
-
-# ============================================================
-# SEND TO GEMINI
-# ============================================================
 
 response = client.models.generate_content(
 
@@ -26,9 +19,6 @@ response = client.models.generate_content(
 )
 
 
-# ============================================================
-# CHECK TOOL CALL
-# ============================================================
 
 if response.function_calls:
 
